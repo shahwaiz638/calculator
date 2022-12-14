@@ -1,10 +1,12 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 void main() {
   runApp(MaterialApp(
+
       home: CalculatorApp()));
 }
 
@@ -12,6 +14,8 @@ void main() {
 class CalculatorApp extends StatefulWidget {
   @override
   _CalculatorAppState createState() => _CalculatorAppState();
+
+
 }
 
 class _CalculatorAppState extends State<CalculatorApp> {
@@ -22,20 +26,35 @@ class _CalculatorAppState extends State<CalculatorApp> {
   String result = "0";
   String expression = "";
 
-  buttonPressed(String buttonText) {
+
+  @override
+  initState() {
+    shared();
+  }
+
+  buttonPressed(String buttonText) async {
+
+    SharedPreferences sp= await SharedPreferences.getInstance();
+
     setState(() {
+
+
+
       if (buttonText == "C") {
         equation = "0";
         result = "0";
         expression = "";
-      } else if (buttonText == "=") {
+      }
+
+      else if (buttonText == "=") {
         expression = equation;
         expression = expression.replaceAll('x', '*');
 
-
+        sp.setString("eq", equation);
         try {
           Parser p = new Parser();
           result = p.parseExpr(expression).toString();
+          sp.setString("result", result);
         } catch (e, stackTrace) {
           result = "Error";
           print(stackTrace);
@@ -70,7 +89,7 @@ class _CalculatorAppState extends State<CalculatorApp> {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(0.0),
             side: BorderSide(
-                color: Colors.white, width: 1, style: BorderStyle.solid)),
+                color: Colors.black12, width: 1, style: BorderStyle.solid)),
         padding: EdgeInsets.all(16.0),
         onPressed: () => buttonPressed(buttonText),
         child: Text(
@@ -84,34 +103,55 @@ class _CalculatorAppState extends State<CalculatorApp> {
     );
   }
 
+  void shared() async
+  {
+    SharedPreferences sp= await SharedPreferences.getInstance();
+    result=sp.getString("result") ?? "";
+    equation=sp.getString("eq") ?? "";
+
+    //sp.remove("result");
+    sp.remove("eq");
+  }
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
 
+
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: Text('Calculator'),
       ),
       body: MediaQuery
           .of(context)
-          .platformBrightness == Brightness.dark
+          .platformBrightness == Brightness.light
           ? Column(children: <Widget>[
         Container(
+          color: Colors.black,
           alignment: Alignment.centerRight,
           padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
           child: Text(
             equation,
-            style: TextStyle(fontSize: 50.0),
+            style: TextStyle(
+              color: Colors.white,
+                fontSize: 50.0),
           ),
         ),
         Container(
+          color: Colors.black,
           alignment: Alignment.centerRight,
           padding: EdgeInsets.fromLTRB(10, 30, 10, 0),
           child: Text(
             result,
-            style: TextStyle(fontSize: 50.0),
+            style: TextStyle(color: Colors.white,fontSize: 50.0),
           ),
         ),
-        Expanded(child: Divider()),
+        Expanded(
+
+            child: Container(
+              color: Colors.black,
+            ),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -123,29 +163,29 @@ class _CalculatorAppState extends State<CalculatorApp> {
               child: Table(
                 children: [
                   TableRow(children: [
-                    buildButton("C", 1, Colors.redAccent),
-                    buildButton("⌫", 1, Colors.blueAccent),
-                    buildButton("÷", 1, Colors.blueAccent),
+                    buildButton("C", 1, Colors.pink),
+                    buildButton("⌫", 1, Colors.amber),
+                    buildButton("÷", 1, Colors.amber),
                   ]),
                   TableRow(children: [
-                    buildButton("7", 1, Colors.black54),
-                    buildButton("8", 1, Colors.black54),
-                    buildButton("9", 1, Colors.black54),
+                    buildButton("7", 1, Colors. black),
+                    buildButton("8", 1, Colors. black),
+                    buildButton("9", 1, Colors. black),
                   ]),
                   TableRow(children: [
-                    buildButton("4", 1, Colors.black54),
-                    buildButton("5", 1, Colors.black54),
-                    buildButton("6", 1, Colors.black54),
+                    buildButton("4", 1, Colors.black),
+                    buildButton("5", 1, Colors.black),
+                    buildButton("6", 1, Colors. black),
                   ]),
                   TableRow(children: [
-                    buildButton("1", 1, Colors.black54),
-                    buildButton("2", 1, Colors.black54),
-                    buildButton("3", 1, Colors.black54),
+                    buildButton("1", 1, Colors. black),
+                    buildButton("2", 1, Colors. black),
+                    buildButton("3", 1, Colors. black),
                   ]),
                   TableRow(children: [
-                    buildButton(".", 1, Colors.black54),
-                    buildButton("0", 1, Colors.black54),
-                    buildButton("00", 1, Colors.black54),
+                    buildButton(".", 1, Colors. black),
+                    buildButton("0", 1, Colors. black),
+                    buildButton("00", 1, Colors. black),
                   ]),
                 ],
               ),
@@ -158,16 +198,16 @@ class _CalculatorAppState extends State<CalculatorApp> {
               child: Table(
                 children: [
                   TableRow(children: [
-                    buildButton("x", 1, Colors.blueAccent),
+                    buildButton("x", 1, Colors.amber),
                   ]),
                   TableRow(children: [
-                    buildButton("-", 1, Colors.blueAccent),
+                    buildButton("-", 1, Colors.amber),
                   ]),
                   TableRow(children: [
-                    buildButton("+", 1, Colors.blueAccent),
+                    buildButton("+", 1, Colors.amber),
                   ]),
                   TableRow(children: [
-                    buildButton("=", 2, Colors.redAccent),
+                    buildButton("=", 2, Colors.pink),
                   ]),
                 ],
               ),
